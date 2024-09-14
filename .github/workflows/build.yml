@@ -28,7 +28,7 @@ jobs:
           mvn package
           
       - name: Upload JAR artifact
-        uses: actions/upload-artifact@4
+        uses: actions/upload-artifact@v4
         with:
           name: discord-bot
           path: target/discord-bot-1.0-SNAPSHOT.jar
