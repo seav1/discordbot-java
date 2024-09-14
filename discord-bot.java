@@ -76,7 +76,9 @@ public class MyBot extends ListenerAdapter {
             if (parts.length == 2) {
                 String location = parts[1];
                 try {
-                    String url = "http://api.openweathermap.org/data/2.5/weather?q=" + URLEncoder.encode(location, "UTF-8") + "&units=metric&appid=your-openweathermap-api-key-here";
+                    String url = "http://api.openweathermap.org/data/2.5/weather?q=" 
+                        + URLEncoder.encode(location, "UTF-8") 
+                        + "&units=metric&appid=your-openweathermap-api-key-here";
                     URL obj = new URL(url);
                     HttpURLConnection con = (HttpURLConnection) obj.openConnection();
                     con.setRequestMethod("GET");
@@ -88,4 +90,24 @@ public class MyBot extends ListenerAdapter {
                         String response = scanner.useDelimiter("\\A").next();
                         scanner.close();
                         JSONObject json = new JSONObject(response);
-                        double temp = json.getJSONObject
+                        double temp = json.getJSONObject("main").getDouble("temp");  // 修正了这里缺失的括号
+                        String weatherDescription = json.getJSONArray("weather")
+                                                       .getJSONObject(0)
+                                                       .getString("description");
+
+                        MessageChannel channel = event.getChannel();
+                        channel.sendMessage("The temperature in " + location 
+                            + " is " + temp + "°C with " + weatherDescription).queue();
+                    } else {
+                        MessageChannel channel = event.getChannel();
+                        channel.sendMessage("Unable to get weather data for " + location).queue();
+                    }
+                } catch (Exception e) {
+                    MessageChannel channel = event.getChannel();
+                    channel.sendMessage("An error occurred while fetching the weather.").queue();
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
